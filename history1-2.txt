@@ -1,0 +1,323 @@
+    1  ls
+    2  cd Documents/
+    3  ;s
+    4  ls
+    5  cd ..
+    6  cd Downloads/
+    7  ls
+    8  sudo apt-get install virtualbox-guest-additions-iso
+    9  sudo apt-get install virtualbox-guest-additions-iso
+   10  su root
+   11  sudo apt-get install virtualbox-guest-additions-iso
+   12  apt-get update
+   13  sudo apt-get update
+   14  sudo apt-get install virtualbox-guest-additions-iso
+   15  VboxClient-all
+   16  VboxClient
+   17  pip
+   18  ls
+   19  pwd
+   20  mkdir CurrysFolder
+   21  cd CurrysFolder/
+   22  python --help
+   23  python3 --help
+   24  man python 3
+   25  man python3
+   26  mkdir midiQuiz
+   27  cd midiQuiz/
+   28  ls
+   29  git 
+   30  sudo apt install git
+   31  git init
+   32  git push
+   33  git config --list --show-origin
+   34  git config --global user.name "StephBoyardee"
+   35  git config --global user.email currybuscher@live.com
+   36  git config --help
+   37  ssh-keygen
+   38  ls /home/enkemjay/.ssh/id_rsa
+   39  ls /home/enkemjay/.ssh/
+   40  ls /home/enkemjay/.ssh/ -v
+   41  ls ~/home/enkemjay/.ssh/ -v
+   42  ls ~/home/enkemjay/.ssh/
+   43  ls
+   44  cat basic
+   45  cat basic.pub
+   46  ssh-keygen -t ed25519 -C "currybuscher@live.com"
+   47  ls
+   48  ls -a
+   49  mv basic.pub ..
+   50  ls
+   51  ls basic 
+   52  mv basic ..
+   53  eval 
+   54  eval "$(ssh-agent -s)"
+   55  ssh-add ~/.ssh/id_ed25519.pub
+   56  man chmod
+   57  ssh-keygen -t rsa -C 'currybuscher@live.com'
+   58  cat ~/.ssh/id_rsa.pub
+   59  ssh-add -K ~/.ssh/id_rsa
+   60  ssh-add  ~/.ssh/id_rsa
+   61  git status
+   62  git branch
+   63  git branch -a
+   64  git init
+   65  git status
+   66  git -br
+   67  git branch -b
+   68  git status
+   69  python3 -m venv midiQuizVenvEnv
+   70  apt install python3.10-venv
+   71  sudo apt install python3.10-venv
+   72  python3 -m venv midiQuizVenvEnv
+   73  set --hlep
+   74  man set
+   75  set --help
+   76  set -e/
+   77  set -e
+   78  ls
+   79  history
+   80  exit
+   81  ls
+   82  cd c
+   83  cd CurrysFolder/
+   84  midi
+   85  midiQuiz/
+   86  ls
+   87  cd midiQuiz/
+   88  ls
+   89  as
+   90  source midiQuizVenvEnv/bin/activate
+   91  python -m ensurepip --upgrade
+   92  python3 -m ensurepip --upgrade
+   93  python get-pip.py
+   94  python3 pip
+   95  python3 pip.pyz
+   96  python --v
+   97  python -v
+   98  python --version
+   99  python -m pip install --upgrade pip
+  100  python -m pip installpygame
+  101  python -m pip --installpygame
+  102  python -m pip --install pygame
+  103  python -m pip --help
+  104  python -m pip --install pygame | vim
+  105  python -m pip --help | vim
+  106  python -m pip --help | vim -
+  107  python -m pip --help | grep -P 
+  108  python -m pip --help | grep -P 'asdf' a
+  109  python -m pip --help | grep -P 'asdf'
+  110  python -m pip --help | grep -P 'No'
+  111  python -m 
+  112  python -m pip --help
+  113  python -m pip --install pygame
+  114  python -m pip install pygame
+  115  touch test.py
+  116  vim test.py
+  117  sudo apt install vim
+  118  vim test.py
+  119  python3 test.py 
+  120  vim test.py
+  121  python3 test.py 
+  122  vim test.py
+  123  python3 test.py 
+  124  python3 test.py
+  125  vim test.py
+  126  python3 test.py
+  127  vim test.py
+  128  python3 test.py
+  129  vim test.py
+  130  python3 test.py
+  131  vim test.py
+  132  ls
+  133  ls -a
+  134  rm .test.py.swp 
+  135  vim test.py
+  136  rm .test.py.swp 
+  137  python3 test.py
+  138  rm .test.py.swp 
+  139  vim test.py
+  140  rm .test.py.swp 
+  141  python3 test.py
+  142  vim test.py
+  143  python3 test.py
+  144  vim test.py
+  145  python3 test.py
+  146  vim test.py
+  147  python3 test.py
+  148  vim test.py
+  149  python3 test.py
+  150  sudo apt-get install libasound2
+  151  python3 test.py
+  152  sudo apt-get install --reinstall libasound2 libasound2-data libasound2-plugins
+  153  python3 test.py
+  154  sudo
+  155  sudo su
+  156  ls
+  157  python3 test.py
+  158  ls /usr/local/lib/
+  159  ls /usr/lib/
+  160  ls /usr/lib/ | grep alsa
+  161  ls
+  162  fine / -name libasound_module_conf_pulse.so
+  163  find / -name libasound_module_conf_pulse.so
+  164  sudo su
+  165  python3 test.py
+  166  vim test.py
+  167  python3 test.py
+  168  vim test.py
+  169  python3 test.py
+  170  vim test.py
+  171  python3 test.py
+  172  vim test.py
+  173  python3 test.py
+  174  vim test.py
+  175  python3 test.py
+  176  vim test.py
+  177  python3 test.py
+  178  vim test.py
+  179  python3 test.py
+  180  vim test.py
+  181  python3 test.py
+  182  vim test.py
+  183  python3 test.py
+  184  vim test.py
+  185  python3 test.py
+  186  vim test.py
+  187  python3 test.py
+  188  vim test.py
+  189  python3 test.py
+  190  vim test.py
+  191  python3 test.py
+  192  vim test.py
+  193  python3 test.py
+  194  vim test.py
+  195  python3 test.py
+  196  vim test.py
+  197  python3 test.py
+  198  vim test.py
+  199  python3 test.py
+  200  vim test.py
+  201  python3 test.py
+  202  vim test.py
+  203  python3 test.py
+  204  vim test.py
+  205  python3 test.py
+  206  vim test.py
+  207  python3 test.py
+  208  vim test.py
+  209  python3 test.py
+  210  vim test.py
+  211  python3 test.py
+  212  vim test.py
+  213  python3 test.py
+  214  vim test.py
+  215  python3 test.py
+  216  vim test.py
+  217  python3 test.py
+  218  vim test.py
+  219  python3 test.py
+  220  vim test.py
+  221  python3 test.py
+  222  vim test.py
+  223  python3 test.py
+  224  vim test.py
+  225  python3 test.py
+  226  vim test.py
+  227  python3 test.py
+  228  vim test.py
+  229  python3 test.py
+  230  vim test.py
+  231  python3 test.py
+  232  vim test.py
+  233  python3 test.py
+  234  vim test.py
+  235  python3 test.py
+  236  vim test.py
+  237  python3 test.py
+  238  vim test.py
+  239  python3 test.py
+  240  vim test.py
+  241  python3 test.py
+  242  vim test.py
+  243  python3 test.py
+  244  vim test.py
+  245  cp test.py 
+  246  cp test.py testCoopy.py
+  247  vim test.py
+  248  cp test.py testCoopy.py
+  249  python3 test.py
+  250  vim test.py
+  251  python3 test.py
+  252  vim test.py
+  253  python3 test.py
+  254  vim test.py
+  255  python3 test.py
+  256  exit
+  257  pip install notebook
+  258  python3 pip install notebook
+  259  python3 -m venv midiQuizVenvEnv
+  260  source midiQuizVenvEnv/bin/activate
+  261  python3 test.py
+  262  ls
+  263  cd CurrysFolder/
+  264  ls
+  265  cd midiQuiz/
+  266  ls
+  267  python3 test.py
+  268  exit
+  269  cd CurrysFolder/
+  270  cd midiQuiz/
+  271  ls
+  272  source midiQuizVenvEnv/bin/activate
+  273  ls
+  274  vim test.py
+  275  python3 test.py
+  276  history > history1-1.txt
+  277  ls
+  278  cd CurrysFolder/
+  279  ls
+  280  source midiQuizVenvEnv/bin/activate
+  281  python3 test.py
+  282  python -m pip --install notebook
+  283  python -m pip install notebook
+  284  jupyter notebook
+  285  history | cat | session1.1.history
+  286  history1-0.txt
+  287  history | history1-0.txt
+  288  history > history1-0.txt
+  289  ls
+  290  git status
+  291  git add Untitled.ipynb 
+  292  git add ./*.csv
+  293  git status
+  294  git add test.py
+  295  git add original\ data/*
+  296  git add history1-*
+  297  ls midiQuizVenvEnv/
+  298  git add midiQuizVenvEnv/pyvenv.cfg 
+  299  cat midiQuizVenvEnv/pyvenv.cfg 
+  300  cd CurrysFolder/
+  301  cd midiQuiz/
+  302  git status
+  303  git branch -a
+  304  git commit -m "initial commit: basic midi input detection, and music theory CSVs read into jupyter notebook"
+  305  git push
+  306  git remote add origin https://github.com/StephBoyardee/midiQuiz.git
+  307  git push -u origin main
+  308  git push
+  309  git branch
+  310  git push --set-upstream origin master
+  311  git push --help
+  312  git push --set-upstream origin master
+  313  ssh-add ~/.ssh/id_rsa
+  314  git push --set-upstream origin master
+  315  git push --help
+  316  git --help
+  317  git push --set-upstream origin master
+  318  git remote add origin https://github.com/StephBoyardee/midiQuiz.git
+  319  git remote -v
+  320  git remote set-url --push origin "git@github.com:StephBoyardee/midiQuiz.git"
+  321  git remote -v
+  322  git push --set-upstream origin master
+  323  history > history1-2.txt
