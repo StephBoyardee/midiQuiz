@@ -4,25 +4,41 @@ from tkinter import *
 import tkinter.font as tkFont
 import random
 
+import time
+from time import sleep
+
+import pickle
+
 class myLabel(Frame):
 
     def nextChord(self):
-        self.chordDescriptionTitle.set(random.choice(self.chords))
+        if self.App:
+            self.App.nextChord()
+
+    def onClick(self):
+        if self.App:
+            self.App.checkMidi()
+        else:
+            print("myLabelAppnotset")
 
     def __create_widgets(self):
         self.chordDescriptionTitle=StringVar()
         self.chordDescriptionTitle.set("TBD Chord")
         self.label = Label(self, text="Chord Description", anchor=CENTER, borderwidth=1, relief="solid")
-        self.chordDecriptionLabel = Label(self, text=str(self.chordDescriptionTitle), textvariable=self.chordDescriptionTitle, font=('Samyak Devanagari', 32, "bold"), anchor=CENTER, borderwidth=1, relief="solid")
+        self.chordDescriptionLabel = Label(self, text=str(self.chordDescriptionTitle), textvariable=self.chordDescriptionTitle, font=('Samyak Devanagari', 32, "bold"), anchor=CENTER, borderwidth=1, relief="solid")
         self.label.grid(row=0, sticky=(S,W))
-        self.chordDecriptionLabel.grid(row=1,sticky=(N,W))
-        self.nextChordButton= Button(self, text="Next Chord", command=self.nextChord, borderwidth=1, relief="solid")
+        self.chordDescriptionLabel.grid(row=1,sticky=(N,W))
+        self.nextChordButton = Button(self, text="Next Chord", command=self.nextChord, borderwidth=1, relief="solid")
         self.nextChordButton.grid(row=2,sticky=(N,W))
+
+        self.startTest = Button(self, text="Start Test", command=self.onClick, borderwidth=1, relief="solid")
+        self.startTest.grid(row=3,sticky=(N,W))
 
     def __init__(self, _window, _chords):
         super().__init__(_window)
         self.chords=_chords
         self.__create_widgets();
+        self.App=None
 
 class mySearchableListbox(Frame):
 
@@ -58,8 +74,8 @@ class mySearchableListbox(Frame):
             self.listbox.insert('end', item) 
 
     def updateSelectedValuesText(self, event):
-        curselectionValues=map(self.listbox.get, self.listbox.curselection())
-        self.selectedValuesAsString.set(", ".join(curselectionValues))
+        self.curselectionValues=map(self.listbox.get, self.listbox.curselection())
+        self.selectedValuesAsString.set(", ".join(self.curselectionValues))
         self.selectedValuesText.config(width=self.listbox.winfo_width()//self.monoCharPixelSize)
 
     def __create_widgets(self):
@@ -101,6 +117,9 @@ class mySearchableListbox(Frame):
         # we need to have a vertical view 
         self.scrollbar.config(command = self.listbox.yview)
 
+    def getSelectedValues(self):
+        return list(self.curselectionValues)
+
 
     def __init__(self, _window, _title, _input_list):
         super().__init__(_window, width=100)
@@ -118,7 +137,6 @@ class mySearchableListbox(Frame):
         self.rowconfigure(2, weight=0)
         self.rowconfigure(3, weight=1)
 
-
         self.__create_widgets()
 
 class App(Tk):
@@ -131,9 +149,20 @@ class App(Tk):
         # windows only (remove the minimize/maximize button)
         self.attributes()
 
+        fileName="midiQuizData.p"
+        with open(fileName, 'rb') as dbfile: 
+            payload = pickle.load(dbfile)
+            (self.noteOn, self.noteOff, self.dOnOff, self.uniqueNotes, self.uniqueChordTypes, self.chordNumeralsRoman, self.dAnsiNotesWithOctave, self.dAnsiNotesWithoutOctave, self.dfChordsSimplified) = payload
+        
+        pg.init()
+        md.init()
+        self.selectedChordRoots=[]
+        self.selectedChordTypes=[]
+
         #content = Frame(root, padding=(3,3,12,12))
 
         self.__create_widgets()
+
 
         # layout on the root window
         self.columnconfigure(0, weight=1)
@@ -147,25 +176,82 @@ class App(Tk):
         # create the input frame
         l2=["a","b","c","d","e","a","b","c","d","e","a","b","c","d","e","a","b","c","d","e","a","b","c","d","e","a","b","c","d","e"]  
 
-        sbox1 = mySearchableListbox(self, "Chords", l2)
-        sbox1.grid(column=0, row=0, stick=(N, W))
+        self.chordRootsListbox = mySearchableListbox(self, "Chords Roots", uniqueNotes)
+        self.chordRootsListbox.grid(column=0, row=0, stick=(N, W))
 
-        sbox1 = mySearchableListbox(self, "Chords", l2)
-        sbox1.grid(column=2, row=0, stick=(N, E))
+        self.chordTypesListbox = mySearchableListbox(self, "Chord Types", uniqueChordTypes)
+        self.chordTypesListbox.grid(column=2, row=0, stick=(N, E))
 
-        sbox1 = mySearchableListbox(self, "Chords", l2)
-        sbox1.grid(column=2, row=2, stick=(S, E))
+        self.sbox1 = mySearchableListbox(self, "Chords1", l2)
+        self.sbox1.grid(column=2, row=2, stick=(S, E))
 
-        sbox1 = mySearchableListbox(self, "Chords", l2)
-        sbox1.grid(column=0, row=2, stick=(S, W))
+        self.sbox2 = mySearchableListbox(self, "Chords2", l2)
+        self.sbox2.grid(column=0, row=2, stick=(S, W))
 
-        chordPromptFrame = myLabel(self,l2)
-        chordPromptFrame.grid(column=1, row=0, rowspan=3, stick=(N,W))
+        self.chordPromptFrame = myLabel(self,l2)
+        self.chordPromptFrame.grid(column=1, row=0, rowspan=3, stick=(N,W))
+        self.chordPromptFrame.App=self
+
+    def checkTestedChord(self, _notesOn):
+        testedChord = dfw[(dfw['CHORD_ROOT']==testedChordRoot) & 
+                  (dfw['CHORD_TYPE']==testedChordType)]
+        testedChordNotes=testedChord.iloc[:, 3:10]
+        numCorrectNotes=0
+        for i in _notesOn:
+            #False if any note is not in the chord
+            if (testedChordNotes!=i).any().any():
+                return False
+            #False if chord is missing
+            if (testedChordNotes==i).any().any():
+                numCorrectNotes+=1
+        nan_count = testedChordNotes.isna().sum().sum()
+        if numCorrectNotes+nan_count==7:
+            return True
+        return False
 
 
-        # create the button frame
-        #sbox2 = mySearchableListbox(self)
-        #sbox2.grid(column=1, row=0)
+    def generateRandomChordsList(self):
+        dfw=self.dfChordsSimplified
+        # selecting rows based on condition 
+        selectedChords = dfw[dfw['CHORD_ROOT'].isin(self.selectedChordRoots) & 
+                  dfw['CHORD_TYPE'].isin(selectedChordTypes)]
+        self.randomizedSelectedChords=selectedChords.sample(n = selectedChords.shape[0], replace = False)
+
+    def nextChord(self):
+        if len(self.randomizedSelectedChords)>0:
+            self.chordDescriptionTitle.set(self.randomizedSelectedChords.pop(0))
+        else:
+            self.generateRandomChordsList()
+            self.chordDescriptionTitle.set(self.randomizedSelectedChords.pop(0))
+
+    def checkMidi(self):
+        self.selectedChordRoots = self.chordRootsListbox.getSelectedValues()
+        self.selectedChordTypes = self.chordTypesListbox.getSelectedValues()
+        delaySeconds = 10
+        close_time = time.time()+delaySeconds
+        midi_in=md.Input(3)
+
+        notesOn = []
+        while close_time>time.time():
+            
+            sleep(.1)
+            midi_data=md.Input.read(midi_in, 100)
+
+            for i in range(len(midi_data)):
+                midi_note, timestamp = midi_data[i]
+                print(timestamp, midi_note[0], midi_note[1], midi_note[2])
+
+                if midi_note[0]==noteOn:
+                    notesOn.append(d[midi_note[1]])
+
+                elif midi_note[0]==noteOff:
+                    notesOn.remove(d[midi_note[1]])
+
+                print(notesOn)
+            if self.checkTestedChord(notesOn):
+                self.nextChord()
+    
+    continue
 
 
 if __name__ == "__main__":
