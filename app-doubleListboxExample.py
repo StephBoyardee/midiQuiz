@@ -3,6 +3,10 @@
 from tkinter import *
 import tkinter.font as tkFont
 import random
+import pygame as pg
+#import pygame.event as ev
+import pygame.midi as md
+import pandas as pd
 
 import time
 from time import sleep
@@ -129,6 +133,7 @@ class mySearchableListbox(Frame):
         self.title=_title
         myFont = tkFont.Font(family='TkFixedFont')
         self.monoCharPixelSize = myFont.measure("X")
+        self.curselectionValues=[]
 
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=0)
@@ -158,6 +163,7 @@ class App(Tk):
         md.init()
         self.selectedChordRoots=[]
         self.selectedChordTypes=[]
+        self.testedChord=pd.DataFrame()
 
         #content = Frame(root, padding=(3,3,12,12))
 
@@ -176,10 +182,10 @@ class App(Tk):
         # create the input frame
         l2=["a","b","c","d","e","a","b","c","d","e","a","b","c","d","e","a","b","c","d","e","a","b","c","d","e","a","b","c","d","e"]  
 
-        self.chordRootsListbox = mySearchableListbox(self, "Chords Roots", uniqueNotes)
+        self.chordRootsListbox = mySearchableListbox(self, "Chords Roots", self.uniqueNotes)
         self.chordRootsListbox.grid(column=0, row=0, stick=(N, W))
 
-        self.chordTypesListbox = mySearchableListbox(self, "Chord Types", uniqueChordTypes)
+        self.chordTypesListbox = mySearchableListbox(self, "Chord Types", self.uniqueChordTypes)
         self.chordTypesListbox.grid(column=2, row=0, stick=(N, E))
 
         self.sbox1 = mySearchableListbox(self, "Chords1", l2)
@@ -193,9 +199,8 @@ class App(Tk):
         self.chordPromptFrame.App=self
 
     def checkTestedChord(self, _notesOn):
-        testedChord = dfw[(dfw['CHORD_ROOT']==testedChordRoot) & 
-                  (dfw['CHORD_TYPE']==testedChordType)]
-        testedChordNotes=testedChord.iloc[:, 3:10]
+        testedChordNotes=self.testedChord.iloc[:, 3:10]
+        print(type(self.testedChord.iloc[:, 3:10]), self.testedChord.iloc[:, 3:10])
         numCorrectNotes=0
         for i in _notesOn:
             #False if any note is not in the chord
@@ -218,11 +223,21 @@ class App(Tk):
         self.randomizedSelectedChords=selectedChords.sample(n = selectedChords.shape[0], replace = False)
 
     def nextChord(self):
+        def combine_columns(row):
+            return row['CHORD_ROOT'] + row['CHORD_TYPE']
+
+        # Apply the custom function to each row of the DataFrame
+        #df['C'] = df.apply(combine_columns, axis=1)
         if len(self.randomizedSelectedChords)>0:
-            self.chordDescriptionTitle.set(self.randomizedSelectedChords.pop(0))
+            self.testedChord=self.randomizedSelectedChords.T.pop(0).T
+            self.testedChord['chord']=self.testedChord.apply(combine_columns, axis=1)
+            self.chordPromptFrame.chordDescriptionTitle.set(self.testedChord.iloc[0]['chord'])
+            print(type(self.testedChord.iloc[0]['chord']), self.testedChord.iloc[0]['chord'])
+
         else:
             self.generateRandomChordsList()
-            self.chordDescriptionTitle.set(self.randomizedSelectedChords.pop(0))
+            self.chordPromptFrame.chordDescriptionTitle.set(self.testedChord.iloc[0]['chord'])
+            print(type(self.testedChord.iloc[0]['chord']), self.testedChord.iloc[0]['chord'])
 
     def checkMidi(self):
         self.selectedChordRoots = self.chordRootsListbox.getSelectedValues()
@@ -241,17 +256,15 @@ class App(Tk):
                 midi_note, timestamp = midi_data[i]
                 print(timestamp, midi_note[0], midi_note[1], midi_note[2])
 
-                if midi_note[0]==noteOn:
-                    notesOn.append(d[midi_note[1]])
+                if midi_note[0]==self.noteOn:
+                    notesOn.append(self.dAnsiNotesWithoutOctave[midi_note[1]])
 
-                elif midi_note[0]==noteOff:
-                    notesOn.remove(d[midi_note[1]])
+                elif midi_note[0]==self.noteOff:
+                    notesOn.remove(self.dAnsiNotesWithoutOctave[midi_note[1]])
 
                 print(notesOn)
             if self.checkTestedChord(notesOn):
                 self.nextChord()
-    
-    continue
 
 
 if __name__ == "__main__":
