@@ -2,6 +2,27 @@
 #from tkinter import ttk
 from tkinter import *
 import tkinter.font as tkFont
+import random
+
+class myLabel(Frame):
+
+    def nextChord(self):
+        self.chordDescriptionTitle.set(random.choice(self.chords))
+
+    def __create_widgets(self):
+        self.chordDescriptionTitle=StringVar()
+        self.chordDescriptionTitle.set("TBD Chord")
+        self.label = Label(self, text="Chord Description", anchor=CENTER, borderwidth=1, relief="solid")
+        self.chordDecriptionLabel = Label(self, text=str(self.chordDescriptionTitle), textvariable=self.chordDescriptionTitle, font=('Samyak Devanagari', 32, "bold"), anchor=CENTER, borderwidth=1, relief="solid")
+        self.label.grid(row=0, sticky=(S,W))
+        self.chordDecriptionLabel.grid(row=1,sticky=(N,W))
+        self.nextChordButton= Button(self, text="Next Chord", command=self.nextChord, borderwidth=1, relief="solid")
+        self.nextChordButton.grid(row=2,sticky=(N,W))
+
+    def __init__(self, _window, _chords):
+        super().__init__(_window)
+        self.chords=_chords
+        self.__create_widgets();
 
 class mySearchableListbox(Frame):
 
@@ -23,7 +44,7 @@ class mySearchableListbox(Frame):
                     self.searchResultList.append(item)                 
        
         # update searchResultList in listbox 
-        self.updateSearchResultList() 
+        self.updateSearchResultList()
 
 
        
@@ -39,9 +60,7 @@ class mySearchableListbox(Frame):
     def updateSelectedValuesText(self, event):
         curselectionValues=map(self.listbox.get, self.listbox.curselection())
         self.selectedValuesAsString.set(", ".join(curselectionValues))
-        print("x: ", self.grid_bbox(column=0, row=4),self.grid_bbox(column=0, col2=1, row=4))
-        self.selectedValuesText.config(width=self.listbox.winfo_reqwidth()//self.monoCharPixelSize)
-
+        self.selectedValuesText.config(width=self.listbox.winfo_width()//self.monoCharPixelSize)
 
     def __create_widgets(self):
         self.label = Label(self, text=self.title)
@@ -49,7 +68,7 @@ class mySearchableListbox(Frame):
 
         self.selectedValuesText = Label(self, text=self.title, textvariable=self.selectedValuesAsString, font='TkFixedFont', height=4, width=20, anchor=NW, justify=LEFT)
         self.selectedValuesText.grid(column=0, columnspan=2, row=self.label.grid_info()['row']+1, sticky=(N,S,E,W))
-        self.selectedValuesText.bind('<Configure>', lambda e: self.selectedValuesText.config(wraplength=self.winfo_reqwidth()))
+        self.selectedValuesText.bind('<Configure>', lambda e: self.selectedValuesText.config(wraplength=self.winfo_width()))
 
         self.entry = Entry(self) 
         self.entry.grid(column=0, columnspan=2, row=self.selectedValuesText.grid_info()['row']+1, sticky=(N,S,E,W))
@@ -59,14 +78,11 @@ class mySearchableListbox(Frame):
         # for selecting multiple options 
         self.listbox = Listbox(self, selectmode = "multiple", exportselection=0)
         for each_item in range(len(self.dataList)): 
-            self.listbox.insert(END, self.dataList[each_item]) 
-          
-            # coloring alternative lines of listbox 
-            #self.listbox.itemconfig(each_item, bg = "white")
+            self.listbox.insert(END, self.dataList[each_item])
 
         self.listbox.grid(column=0, row=self.entry.grid_info()['row']+1, sticky=(N,S,E,W))
         self.listbox.bind('<<ListboxSelect>>', self.updateSelectedValuesText)
-        self.selectedValuesText.bind('<<ListboxSelect>>', lambda e: self.selectedValuesText.config(width=self.winfo_reqwidth()//self.monoCharPixelSize))
+        self.selectedValuesText.bind('<<ListboxSelect>>', lambda e: self.selectedValuesText.config(width=self.winfo_width()//self.monoCharPixelSize))
 
         # Creating a Scrollbar and  
         # attaching it to root window 
@@ -85,16 +101,9 @@ class mySearchableListbox(Frame):
         # we need to have a vertical view 
         self.scrollbar.config(command = self.listbox.yview)
 
-        self.update_idletasks()
-        print(self.winfo_reqwidth(),self.monoCharPixelSize)
-
-        self.selectedValuesText.config(width=self.winfo_reqwidth()//self.monoCharPixelSize)
-        print("x: ", self.grid_bbox(column=0, row=4),self.grid_bbox(column=0, col2=1, row=4))
-
 
     def __init__(self, _window, _title, _input_list):
         super().__init__(_window, width=100)
-        print("!!width: ", self.winfo_reqwidth())
         self.searchResultList=[]
         self.selectedValuesAsString=StringVar()
         self.dataList=_input_list
@@ -128,9 +137,11 @@ class App(Tk):
 
         # layout on the root window
         self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
+        self.columnconfigure(1, weight=4)
+        self.columnconfigure(2, weight=1)
         self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
+        self.rowconfigure(1, weight=4)
+        self.rowconfigure(2, weight=1)
 
     def __create_widgets(self):
         # create the input frame
@@ -140,13 +151,16 @@ class App(Tk):
         sbox1.grid(column=0, row=0, stick=(N, W))
 
         sbox1 = mySearchableListbox(self, "Chords", l2)
-        sbox1.grid(column=1, row=0, stick=(N, E))
+        sbox1.grid(column=2, row=0, stick=(N, E))
 
         sbox1 = mySearchableListbox(self, "Chords", l2)
-        sbox1.grid(column=1, row=1, stick=(S, E))
+        sbox1.grid(column=2, row=2, stick=(S, E))
 
         sbox1 = mySearchableListbox(self, "Chords", l2)
-        sbox1.grid(column=0, row=1, stick=(S, W))
+        sbox1.grid(column=0, row=2, stick=(S, W))
+
+        chordPromptFrame = myLabel(self,l2)
+        chordPromptFrame.grid(column=1, row=0, rowspan=3, stick=(N,W))
 
 
         # create the button frame
@@ -157,3 +171,5 @@ class App(Tk):
 if __name__ == "__main__":
     app = App()
     app.mainloop()
+
+    #Samyak Devanagari
