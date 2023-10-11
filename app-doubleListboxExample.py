@@ -8,6 +8,7 @@ import pygame as pg
 #import pygame.event as ev
 import pygame.midi as md
 import pandas as pd
+import numpy as np
 
 import inspect
 
@@ -20,16 +21,21 @@ from time import sleep
 
 import pickle
 
+dFlatToSharp={'Cb': 'B#', 'Db': 'C#', 'Eb': 'D#', 'Fb': 'E#', 'Gb': 'E#', 'Ab': 'G#', 'Bb': 'A#'}
+
 class myLabel(Frame):
 
     def nextChord(self):
         if self.App and self.App.isValidSelection():
             self.App.nextChord()
+            return 1
+        return 0
 
     def onClick(self):
-        if self.App and self.App.isValidSelection():
-            if(self.App.nextChord()):
-                self.App.checkMidi()
+        if self.nextChord():
+            self.App.checkMidi()
+        else:
+            print('zxcvzxvc')
 
     def __create_widgets(self):
         self.testChordVar=StringVar()
@@ -84,7 +90,7 @@ class mySearchableListbox(Frame):
             self.listbox.insert('end', item) 
 
     def updateSelectedValuesText(self, event):
-        self.curselectionValues = [listbox.get(idx) for idx in listbox.curselection()]
+        self.curselectionValues = [self.listbox.get(idx) for idx in self.listbox.curselection()]
         print(self.curselectionValues)
         self.selectedValuesAsString.set(", ".join(self.curselectionValues))
         self.selectedValuesText.config(width=self.listbox.winfo_width()//self.monoCharPixelSize)
@@ -129,7 +135,6 @@ class mySearchableListbox(Frame):
         self.scrollbar.config(command = self.listbox.yview)
 
     def getSelectedValues(self):
-        print("xxxx", self.curselectionValues)
         return list(self.curselectionValues)
 
 
@@ -166,19 +171,21 @@ class App(Tk):
         with open(fileName, 'rb') as dbfile: 
             payload = pickle.load(dbfile)
             (self.noteOn, self.noteOff, self.dOnOff, self.uniqueNotes, self.uniqueChordTypes, self.chordNumeralsRoman, self.dAnsiNotesWithOctave, self.dAnsiNotesWithoutOctave, self.dfChordsSimplified) = payload
-        print(payload)
-        print("asdfasdf")
-        print(self.noteOn, self.noteOff, self.dOnOff, self.uniqueNotes, self.uniqueChordTypes, self.chordNumeralsRoman, self.dAnsiNotesWithOctave, self.dAnsiNotesWithoutOctave, self.dfChordsSimplified)
+        #print(payload)
+        #print("asdfasdf")
+        #print(self.noteOn, self.noteOff, self.dOnOff, self.uniqueNotes, self.uniqueChordTypes, self.chordNumeralsRoman, self.dAnsiNotesWithOctave, self.dAnsiNotesWithoutOctave, self.dfChordsSimplified)
         pg.init()
         md.init()
+        self.midi_in=md.Input(3)
         self.selectedChordRoots=[]
         self.selectedChordTypes=[]
-        self.testedChord=pd.DataFrame()
+        self.dfTestedChord=pd.DataFrame()
         self.randomizedSelectedChords=pd.DataFrame()
 
         #content = Frame(root, padding=(3,3,12,12))
 
         self.__create_widgets()
+        print("INITITINITNITNITNITN")
 
 
         # layout on the root window
@@ -210,17 +217,29 @@ class App(Tk):
         self.chordPromptFrame.App=self
 
     def checkTestedChord(self, _notesOn):
-        testedChordNotes=self.testedChord.iloc[:, 3:10]
-        print(type(self.testedChord.iloc[:, 3:10]), self.testedChord.iloc[:, 3:10])
-        numCorrectNotes=0
+        print(type(_notesOn), _notesOn)
+        testedChordNotes=self.dfTestedChord.iloc[3:10]
+        #print(testedChordNotes.shape)
+        #print(type(self.dfTestedChord.iloc[3:10]), self.dfTestedChord.iloc[3:10])
+
+        testedChordNotes=testedChordNotes.replace(dFlatToSharp)
+        #+1 to account for the np.nan in _notesOn
+        return (testedChordNotes.isin(_notesOn).all() and (testedChordNotes.count()+1 == len(_notesOn)))
+
+        #print(dfChordsNotesTmp.isin(list(testedChordNotes.replace(dFlatToSharp))).all())
+
+        #print(_notesOn)
+        #print(type(_notesOn[0]))
+        #print(testedChordNotes)
+        #print(type(testedChordNotes.iloc[0]))
         for i in _notesOn:
             #False if any note is not in the chord
-            if (testedChordNotes!=i).any().any():
+            if (testedChordNotes!=i).any():
                 return False
             #False if chord is missing
-            if (testedChordNotes==i).any().any():
+            if (testedChordNotes==i).any():
                 numCorrectNotes+=1
-        nan_count = testedChordNotes.isna().sum().sum()
+        nan_count = testedChordNotes.isna().sum()
         if numCorrectNotes+nan_count==7:
             return True
         return False
@@ -233,49 +252,65 @@ class App(Tk):
         self.randomizedSelectedChords=dfw.sample(n = dfw.shape[0], replace = False)
 
     def isValidSelection(self):
-        inspectStack()
         self.selectedChordRoots = self.chordRootsListbox.getSelectedValues()
         self.selectedChordTypes = self.chordTypesListbox.getSelectedValues()
-        print(self.selectedChordRoots)
-        print(self.selectedChordTypes)
         if len(self.selectedChordRoots) == 0 or len(self.selectedChordRoots) == 0:
-
             def close_window():
                 dialog.grab_release()
                 dialog.destroy()
+
             dialog = Toplevel(self)
             dialog.geometry('400x100')
             dialog.title("Invalid Entry")
             Label(dialog, text="Empty Chord Root or Chord Type.\nPlease make a selection and try again.").pack()
             Button(dialog,text="close",command=close_window).pack()
             dialog.grab_set()
-
-            #messagebox.showinfo's size is not configurable. hence the dialogue code above
-            #msgObj=msg.showinfo("Invalid Entry","Empty Chord Root or Chord Type.\nPlease make a selection and try again.")
             return 0
         return 1
 
     def nextChord(self):
         #Once we've gone through all unique chords matching the selection, regenerate a new random sequence of chords
+#        print(type(self.randomizedSelectedChords),self.randomizedSelectedChords.shape, self.randomizedSelectedChords)
         if self.randomizedSelectedChords.shape[0]==0:
+#            print(type(self.randomizedSelectedChords),self.randomizedSelectedChords.shape, self.randomizedSelectedChords)
             self.generateRandomChordsList()
+        #    print(type(self.randomizedSelectedChords),self.randomizedSelectedChords.shape, self.randomizedSelectedChords)
+        #print(type(self.randomizedSelectedChords),self.randomizedSelectedChords.shape, self.randomizedSelectedChords,self.randomizedSelectedChords.iloc[0], self.randomizedSelectedChords.iloc[0][0])
 
         # setDfTestedChord to the first chord's data; Set testChordVar to the first chord's combine CHORD_ROOT and CHORD_TYPE; Remove first row
-        self.dfTestedChord=randomizedSelectedChords.iloc[0]
-        testChordVar.set(tmpdf.iloc[0].iloc[0]+tmpdf.iloc[0].iloc[1])
-        randomizedSelectedChords=randomizedSelectedChords[1: , :]#row ,  col
+        self.dfTestedChord=self.randomizedSelectedChords.iloc[0]
+        self.chordPromptFrame.testChordVar.set(self.dfTestedChord.iloc[0]+self.dfTestedChord.iloc[1])
+        print(type(self.dfTestedChord), self.dfTestedChord.shape, self.dfTestedChord)
+        self.randomizedSelectedChords=self.randomizedSelectedChords[1:]#row ,  col
 
     def checkMidi(self):
+        print('asdfasdfasdafsafsdasfd')
         delaySeconds = 10
+
+        #except md.MidiException as e:
+        #    print(e)
+        #    print("midi device not detected")
+        #    i=0
+        #    while md.get_device_info(i) is not None:
+        #        print(md.get_device_info(i))
+        #        i += 1
+        #    return
+
+        #clear buffer TODO doesn't seem to work. Need to find out why I'm crashing
+        midi_data=md.Input.read(self.midi_in, 1024)
+        midi_data=md.Input.read(self.midi_in, 1024)
+        midi_data=md.Input.read(self.midi_in, 1024)
+        midi_data=md.Input.read(self.midi_in, 1024)
         close_time = time.time()+delaySeconds
-        midi_in=md.Input(3)
-
-        notesOn = []
+        notesOn = [np.nan]
         while close_time>time.time():
+            self.update_idletasks()
             
-            sleep(1)
-            midi_data=md.Input.read(midi_in, 100)
-
+            #TODO logic does count if you don't hold it on timer
+            #Should probably change it to check every input (keep logic just move checkTested Chord to end of the inside of for loop)
+            sleep(.1)
+            midi_data=md.Input.read(self.midi_in, 100)
+            
             for i in range(len(midi_data)):
                 midi_note, timestamp = midi_data[i]
                 print(timestamp, midi_note[0], midi_note[1], midi_note[2])
@@ -286,9 +321,11 @@ class App(Tk):
                 elif midi_note[0]==self.noteOff:
                     notesOn.remove(self.dAnsiNotesWithoutOctave[midi_note[1]])
 
-                #print(notesOn)
+            print('notesOn',notesOn)
             if self.checkTestedChord(notesOn):
                 self.nextChord()
+        notesOn=[np.nan]
+
 
 
 if __name__ == "__main__":
