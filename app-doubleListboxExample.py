@@ -144,6 +144,8 @@ class mySearchableListbox(Frame):
         self.selectedValuesAsString=StringVar()
         self.dataList=_input_list
         self.title=_title
+        self.majorKeyChordProgression=[]
+        self.minorKeyChordProgression=[]
         myFont = tkFont.Font(family='TkFixedFont')
         self.monoCharPixelSize = myFont.measure("X")
         self.curselectionValues=[]
@@ -170,10 +172,8 @@ class App(Tk):
         fileName="midiQuizData.p"
         with open(fileName, 'rb') as dbfile: 
             payload = pickle.load(dbfile)
-            (self.noteOn, self.noteOff, self.dOnOff, self.uniqueNotes, self.uniqueChordTypes, self.chordNumeralsRoman, self.dAnsiNotesWithOctave, self.dAnsiNotesWithoutOctave, self.dfChordsSimplified) = payload
-        #print(payload)
-        #print("asdfasdf")
-        #print(self.noteOn, self.noteOff, self.dOnOff, self.uniqueNotes, self.uniqueChordTypes, self.chordNumeralsRoman, self.dAnsiNotesWithOctave, self.dAnsiNotesWithoutOctave, self.dfChordsSimplified)
+            (self.noteOn, self.noteOff, self.dOnOff, self.uniqueNotes, self.uniqueChordTypes, self.majorKeyChordProgression, self.minorKeyChordProgression, self.dAnsiNotesWithOctave, self.dAnsiNotesWithoutOctave, self.dfChordsSimplified) = payload
+
         pg.init()
         md.init()
         self.midi_in=md.Input(3)
@@ -284,7 +284,6 @@ class App(Tk):
         self.randomizedSelectedChords=self.randomizedSelectedChords[1:]#row ,  col
 
     def checkMidi(self):
-        print('asdfasdfasdafsafsdasfd')
         delaySeconds = 10
 
         #except md.MidiException as e:

@@ -15,7 +15,11 @@ dfChordsSimplified=dfChords.copy()
 
 uniqueNotes=list(dfChords.CHORD_ROOT.unique())
 uniqueChordTypes=list(dfChords.CHORD_TYPE.unique())
-chordNumeralsRoman=['I','II','iii','IV','V','Vi','VII']
+majorKeyChordProgression=['I','ii','iii','IV','V','vi','VII°']
+minorKeyChordProgression=['I','ii°','iii','iv','V','VI','VII','vii°']
+major7thKeyChordProgression=["I7", "ii7", "ⅲ7", "IV7", "V7", "vi7", "vii∅7"]
+minor7thKeyChordProgression=["ⅰ7", "ii∅7", "III7", "iv7", "v7", "V7", "VI7", "VII7", "vii°7"]
+
 
 noteOn=144
 noteOff=128
@@ -72,6 +76,6 @@ dfChordsSimplified=dfChords.replace({"Notes": dictToNormalNotes,"N/A": dictToNor
 
 fileName="midiQuizData.p"
 with open(fileName, 'ab') as dbfile: 
-	payload=(noteOn, noteOff, dOnOff, uniqueNotes, uniqueChordTypes, chordNumeralsRoman, dAnsiNotesWithOctave, dAnsiNotesWithoutOctave, dfChordsSimplified) 
+	payload=(noteOn, noteOff, dOnOff, uniqueNotes, uniqueChordTypes, majorKeyChordProgression, minorKeyChordProgression, dAnsiNotesWithOctave, dAnsiNotesWithoutOctave, dfChordsSimplified) 
 	pickle.dump(payload, dbfile)
 
